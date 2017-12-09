@@ -20,7 +20,7 @@ class Test {
 			throw new Error(`Regression in test "${name}": unexpected compiled value`);
 		}
 
-		const compiled = new RegExp(rex.string, 'g');
+		const compiled = rex.toRegExp('g', derecurseLevel);
 
 		this.measure[name].runtime = +new Date;
 
