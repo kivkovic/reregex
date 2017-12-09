@@ -215,7 +215,7 @@ class ReRegex {
 				if (i < n) {
 					replacement = `(?:${new ReRegex(this.expression.string.slice(groups[j].from, groups[j].to)).noncapturing().string})`;
 				} else {
-					replacement = '(?:$^)'
+					replacement = 'R^' // this is a guaranteed non-match, regardless of flags
 				}
 				current = current.replace(current.findTokens(`(?${j})`, notBracketed), replacement)
 			}
