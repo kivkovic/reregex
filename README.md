@@ -40,4 +40,4 @@ The first parameter, `flags` is a string containing the flags passed to the nati
 
 The second parameter, `n` is the reursion depth level (default is 100). This value may be overriden by providing an integer parameter to `derecurse`. Safe values for simple recursive patterns (i.e. no recursions referencing other recursions) are around 200-300.
 
-Expressions with recursive groups referencing other recursive groups can escalate exponentially both in terms of transpilation time and the size of the resulting RegExp. For example, the expression: `ab(c|(?2))de(f|(?0))g(?1)h` derecursed to depth 10 produces a 3075 kB regex string.
+Expressions with recursive groups referencing other recursive groups can escalate exponentially both in terms of transpilation time and the size of the resulting RegExp. For example, the expression: `ab(c|(?2))de(f|(?0))g(?1)h` derecursed to depth 10 produces a 2691 kB regex string.
