@@ -1,6 +1,6 @@
 'use strict';
 
-class Gra {
+class Expression {
 
 	constructor(string) {
     	this.string = string;
@@ -51,7 +51,7 @@ class Gra {
 
 		for (let i = 0; i < this.string.length; i++) {
 			if (this.string[i] === left && !this.escaped[i]) {
-				open.push(new Gra.Range({from: i}));
+				open.push(new Expression.Range({from: i}));
 
 			} else if (this.string[i] === right && !this.escaped[i]) {
 				open[open.length-1].to = i + 1;
@@ -76,7 +76,7 @@ class Gra {
         	let match;
     		while ((match = token.exec(this.string)) !== null) {
 	        	if (!this.escaped[match.index]) {
-	        		const range = new Gra.Range({from: match.index, to: match.index + match[0].length});
+	        		const range = new Expression.Range({from: match.index, to: match.index + match[0].length});
 	        		if (filter(range)) {
 			        	tokens.push(range);
 			        }
@@ -88,7 +88,7 @@ class Gra {
 	 	    let index, offset = startOffset;
 		    while ((index = this.string.indexOf(token, offset)) != -1){
 		    	offset = index + token.length;
-        		const range = new Gra.Range({from: index, to: index + token.length});
+        		const range = new Expression.Range({from: index, to: index + token.length});
         		if (filter(range)) {
 		        	tokens.push(range);
 		        }
@@ -110,11 +110,11 @@ class Gra {
 
     	constructed.push(this.string.slice(last));
 
-    	return new Gra(constructed.join(''))
+    	return new Expression(constructed.join(''))
     }
 }
 
-Gra.Range = class {
+Expression.Range = class {
 	constructor({from = -1, to = -1}) {
 		this.from = from;
 		this.to = to;
@@ -137,13 +137,13 @@ Gra.Range = class {
 	}
 }
 
-class Rex {
+class ReRegex {
 	constructor(string, flags = 'g') {
 		this._string = string;
 		this.flags = flags;
 
-		this.gra = new Gra(string);
-		this.brackets = this.gra.brackets;
+		this.expression = new Expression(string);
+		this.brackets = this.expression.brackets;
 
 		this._locked = true;
 	}
@@ -164,14 +164,14 @@ class Rex {
 
 		const
 			notBracketed = t => !t.isBracketed(this.brackets),
-			notSpecial = t => this.gra.string[t.from + 1] !== '?';
+			notSpecial = t => this.expression.string[t.from + 1] !== '?';
 
-		this.groups = this.gra.parentheses
+		this.groups = this.expression.parentheses
 			.filter(notBracketed)
 			.filter(notSpecial);
 
-		if (this.groups[0].from !== 0 || this.groups[0].to != this.gra.string.length) {
-			this.groups.unshift(new Gra.Range({from: 0, to: this.gra.string.length}));
+		if (this.groups[0].from !== 0 || this.groups[0].to != this.expression.string.length) {
+			this.groups.unshift(new Expression.Range({from: 0, to: this.expression.string.length}));
 		}
 
 		return this.groups;
@@ -179,9 +179,9 @@ class Rex {
 
 	noncapturing() {
 
-		Rex.noncapturingCache = Rex.noncapturingCache || {};
-		if (Rex.noncapturingCache[this.string]) {
-			return new Rex(Rex.noncapturingCache[this.string]);
+		ReRegex.noncapturingCache = ReRegex.noncapturingCache || {};
+		if (ReRegex.noncapturingCache[this.string]) {
+			return new ReRegex(ReRegex.noncapturingCache[this.string]);
 		}
 
 		this.groups = this.findGroups();
@@ -194,8 +194,8 @@ class Rex {
 			}
 		}
 
-		Rex.noncapturingCache[this.string] = replaced;
-		return new Rex(replaced);
+		ReRegex.noncapturingCache[this.string] = replaced;
+		return new ReRegex(replaced);
 	}
 
 	derecurse(n = 100) {
@@ -204,13 +204,13 @@ class Rex {
 			notBracketed = t => !t.isBracketed(this.brackets),
 			groups = this.findGroups();
 
-		let current = this.gra;
+		let current = this.expression;
 
 		for (let i = 0; i <= n; i++) {
 			for (let j = 0; j < groups.length; j++) {
 				let replacement;
 				if (i < n) {
-					replacement = `(?:${new Rex(this.gra.string.slice(groups[j].from, groups[j].to)).noncapturing().string})`;
+					replacement = `(?:${new ReRegex(this.expression.string.slice(groups[j].from, groups[j].to)).noncapturing().string})`;
 				} else {
 					replacement = '(?:$^)'
 				}
@@ -218,8 +218,8 @@ class Rex {
 			}
 		}
 
-		return new Rex(current.string);
+		return new ReRegex(current.string);
 	}
 }
 
-exports.Rex = Rex;
+exports.ReRegex = ReRegex;
