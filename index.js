@@ -199,6 +199,9 @@ class ReRegex {
 	}
 
 	derecurse(n = 100) {
+		if (this.derecursed == n) {
+			return this;
+		}
 
 		const
 			notBracketed = t => !t.isBracketed(this.brackets),
@@ -218,7 +221,24 @@ class ReRegex {
 			}
 		}
 
-		return new ReRegex(current.string);
+		const regex = new ReRegex(current.string);
+		regex.derecursed = n;
+		return regex;
+	}
+
+	toRegExp(flags = 'g', n = 100) {
+		if (flags && !`${flags}`.match(/[gimuy]+/)) {
+			throw Error(`Invalid value '${flags}' given for parameter 'flags', must be a string with characters: 'g', 'i', 'm', 'u' or 'y'`);
+		}
+
+		if ((n|0) != n || n < 0) {
+			throw Error(`Invalid value '${n}' given for parameter 'n', must be a positive integer`);
+		}
+
+		if (this.derecursed != n) {
+			return this.derecurse(n).toRegExp(flags, n);
+		}
+		return new RegExp(this.string, flags);
 	}
 }
 
