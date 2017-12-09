@@ -1,4 +1,4 @@
-const Rex = require('./index.js').Rex;
+const ReRegex = require('./index.js').ReRegex;
 
 class Test {
 
@@ -12,7 +12,7 @@ class Test {
 		this.measure[name].start = +new Date;
 		this.measure[name].compiletime = +new Date;
 
-		const rex = new Rex(regex).derecurse(derecurseLevel);
+		const rex = new ReRegex(regex).derecurse(derecurseLevel);
 
 		this.measure[name].compiletime = +new Date - this.measure[name].compiletime;
 
